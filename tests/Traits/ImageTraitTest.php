@@ -23,7 +23,7 @@ class ImageTraitTest extends TestCase
     public function testInvalidRemoteImageNotSaved()
     {
         $this->saveImage('http://www.qwertyasdfgzxcv.com/dummy.jpg', '/tmp/images/');
-        $this->assertFileNotExists('/tmp/images/dummy.jpg');
+        $this->assertFileDoesNotExist('/tmp/images/dummy.jpg');
     }
 
     /**

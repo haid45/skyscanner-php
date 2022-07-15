@@ -5,6 +5,7 @@ namespace OzdemirBurak\SkyScanner;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
+use Mosquitto\Message;
 use OzdemirBurak\SkyScanner\Traits\ConsoleTrait;
 
 abstract class TravelService
@@ -159,10 +160,10 @@ abstract class TravelService
             [$url, $parameters] = $this->getRequestUrlAndParameters($url, $method === 'GET');
             return $this->response = $this->client->request($method, $url, $parameters);
         } catch (RequestException $e) {
-            $this->printErrorMessage(Psr7\str($e->getRequest()), false);
+            $this->printErrorMessage(Psr7\Message::toString($e->getResponse()), false);
             if ($e->hasResponse()) {
                 $this->response = $e->getResponse();
-                $this->printErrorMessage(Psr7\str($e->getResponse()), false);
+                $this->printErrorMessage(Psr7\Message::toString($e->getResponse()), false);
             }
         }
         return false;

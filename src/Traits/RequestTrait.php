@@ -38,7 +38,7 @@ trait RequestTrait
             ]);
             return json_decode($response->getBody());
         } catch (RequestException $e) {
-            $this->printErrorMessage(Psr7\str($e->getResponse()), false);
+            $this->printErrorMessage(Psr7\Message::toString($e->getResponse()), false);
         }
         return [];
     }
