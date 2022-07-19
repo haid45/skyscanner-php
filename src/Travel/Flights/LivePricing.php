@@ -360,6 +360,7 @@ class LivePricing extends TravelService
             if (isset($itinerary->BookingDetailsLink)) {
                 $this->flights[$key]['BookingDetailsLink'] = $itinerary->BookingDetailsLink;
             }
+            $this->flights[$key]['places'] = $this->data->Places;
         }
     }
 
