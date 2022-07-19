@@ -328,6 +328,23 @@ class LivePricing extends TravelService
     }
 
     /**
+     * Get array of places for mapping with station ID's
+     *
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getPlaces(): array
+    {
+        $places = [];
+        if ($this->init()) {
+            $places = $this->data->Places;
+        } else {
+            $this->printErrorMessage($this->getResponseMessage());
+        }
+        return $places;
+    }
+
+    /**
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -360,7 +377,6 @@ class LivePricing extends TravelService
             if (isset($itinerary->BookingDetailsLink)) {
                 $this->flights[$key]['BookingDetailsLink'] = $itinerary->BookingDetailsLink;
             }
-            $this->flights[$key]['places'] = $this->data->Places;
         }
     }
 
