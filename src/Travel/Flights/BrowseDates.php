@@ -126,8 +126,9 @@ class BrowseDates extends TravelService
     /**
      * @throws GuzzleException
      */
-    public function getQuote($quoteId): array
+    public function getQuote($quoteId,$direction): array
     {
+        $direction = str_replace('Dates','Leg',$direction);
         $quote = [];
         if ($this->init()) {
             $quotes = $this->data->Quotes;
@@ -136,13 +137,17 @@ class BrowseDates extends TravelService
             if($key !== false) {
                 $quote = (array)$quotes[$key];
 
-                foreach (['OutboundLeg', 'InboundLeg'] as $leg) {
-                    if (isset($quote[$leg])) {
-                        $quote[$leg]->Origin = $this->getStationWithId($quote[$leg]->OriginId);
-                        $quote[$leg]->Destination = $this->getStationWithId($quote[$leg]->DestinationId);
-                        foreach ($quote[$leg]->CarrierIds as $carrierId){
-                            $quote[$leg]->carriers[] = $this->getCarrierWithId($carrierId);
+                if (isset($quote[$direction])) {
+                    $quote['Origin'] = $this->getStationWithId($quote[$direction]->OriginId);
+                    $quote['Destination'] = $this->getStationWithId($quote[$direction]->DestinationId);
+
+                    if(count($quote[$direction]->CarrierIds) === 1) {
+                        $quote['Carrier'] = $this->getCarrierWithId($quote[$direction]->CarrierIds[0]);
+                    }else{
+                        foreach ($quote[$direction]->CarrierIds as $carrierId) {
+                            $quote['carriers'][] = $this->getCarrierWithId($carrierId);
                         }
+                        $quote['Carrier'] = 'Multi';
                     }
                 }
             }
@@ -160,13 +165,13 @@ class BrowseDates extends TravelService
     private function addQuotes(): void
     {
         $dates = $this->data->Dates;
-        foreach (['OutboundDates', 'InboundDates'] as $leg) {
-            if (isset($dates->$leg)) {
-               foreach ($dates->$leg as $key => $segment){
-                   foreach ($segment->QuoteIds as $quoteId){
-                       $dates->$leg[$key]->quotes[] = $this->getQuote($quoteId);
-                   }
-               }
+        foreach (['OutboundDates', 'InboundDates'] as $direction) {
+            if (isset($dates->$direction)) {
+                foreach ($dates->$direction as $key => $flightInDirectionForDay){
+                    foreach ($flightInDirectionForDay->QuoteIds as $quoteId){
+                        $dates->$direction[$key]->quotes[] = $this->getQuote($quoteId,$direction);
+                    }
+                }
             }
         }
         $this->flights = (array)$dates;
